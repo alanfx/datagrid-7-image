@@ -11,7 +11,8 @@ public class DeploymentHelper {
          .resolve("org.infinispan:infinispan-client-hotrod",
             "io.fabric8:openshift-client",
             "org.assertj:assertj-core",
-            "org.eclipse.jetty:jetty-client")
+            "org.eclipse.jetty:jetty-client", 
+            "org.slf4j:slf4j-jdk14")
          .withTransitivity().asFile();
    }
 }

@@ -6,20 +6,19 @@ DOCKER_REGISTRY_REDHAT =
 ADDITIONAL_ARGUMENTS =
 
 CE_DOCKER = $(shell docker version | grep Version | head -n 1 | grep -e "-ce")
+DEV_IMAGE_FULL_NAME = $(DOCKER_REGISTRY_ENGINEERING)/$(DEV_IMAGE_ORG)/$(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG)
 ifneq ($(CE_DOCKER),)
 DOCKER_REGISTRY_ENGINEERING = docker-registry.engineering.redhat.com
 DOCKER_REGISTRY_REDHAT = registry.access.redhat.com/
-DEV_IMAGE_FULL_NAME = $(DOCKER_REGISTRY_ENGINEERING)/$(DEV_IMAGE_ORG)/$(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG)
 IMAGE_FULL_NAME = $(DOCKER_REGISTRY_ENGINEERING)/$(DEV_IMAGE_ORG)/$(IMAGE_NAME):$(DEV_IMAGE_TAG)
 CEKIT_CMD = cekit build --overrides=overrides.yaml --target target-docker --tag $(DEV_IMAGE_FULL_NAME)
 else
-DEV_IMAGE_FULL_NAME = $(DEV_IMAGE_ORG)/$(DEV_IMAGE_NAME):$(DEV_IMAGE_TAG)
 CEKIT_CMD = cekit build --target target-docker --tag $(DEV_IMAGE_FULL_NAME)
 endif
 
 # In order to test this image we need to do a little trick. The APB image is pushed under the following name:
-# http://$REGISTRY:5000/myproject/datagrid-services-apb
-# Since the project name (myproject) and image name (datagrid-services-apb) match
+# http://$REGISTRY:5000/dg-service-test/datagrid-services-apb
+# Since the project name (dg-service-test) and image name (datagrid-services-apb) match
 # OpenShift "thinks" that this image has already been pulled from some registry.
 # But the reality is different - we pushed it...
 DEV_APB_IMAGE_NAME = datagrid-services-apb
@@ -32,7 +31,7 @@ MVN_COMMAND = mvn
 # You may replace it with your custom command. See https://github.com/ansibleplaybookbundle/ansible-playbook-bundle#installing-the-apb-tool
 APB_COMMAND = docker run --rm --privileged -v `pwd`:/mnt -v ${HOME}/.kube:/.kube -v /var/run/docker.sock:/var/run/docker.sock -u `id -u` docker.io/ansibleplaybookbundle/apb
 
-_TEST_PROJECT = myproject
+_TEST_PROJECT = dg-service-test
 
 #Set variables for remote openshift when OPENSHIFT_ONLINE_REGISTRY is defined
 ifeq ($(OPENSHIFT_ONLINE_REGISTRY),)
@@ -252,7 +251,7 @@ apb-build:
 .PHONY: apb-build
 
 _add_apb_roles:
-	oc policy add-role-to-user cluster-admin system:serviceaccount:myproject:default -n myproject || true
+	oc policy add-role-to-user cluster-admin system:serviceaccount:dg-service-test:default -n dg-service-test || true
 .PHONY: _add_apb_roles
 
 _wait_for_ansible_service_broker:

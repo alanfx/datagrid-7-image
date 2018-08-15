@@ -8,7 +8,7 @@ public class OpenShiftClientCreator {
 
    //TODO: Get namespace and username from env properties
    private static final OpenShiftClient CLIENT = new DefaultOpenShiftClient(new ConfigBuilder()
-         .withNamespace("myproject")
+         .withNamespace("dg-service-test")
          .withUsername("developer")  //auth token is read from environment property KUBERNETES_AUTH_TOKEN
          .build());
 

@@ -3,7 +3,9 @@ package org.infinispan.online.service.endpoint;
 import static junit.framework.TestCase.assertNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.infinispan.online.service.utils.TestObjectCreator.generateConstBytes;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -186,16 +188,23 @@ public class HotRodTester implements EndpointTester {
       int lastCacheSize = -1;
       long counter = 0;
 
-      //when
-      do {
-         lastCacheSize = currentCacheSize;
-         String key = "key" + counter++;
+      try {
+         //when
+         do {
+            lastCacheSize = currentCacheSize;
+            String key = "key" + counter++;
 
-         byteArrayCache.put(key, randomValue);
-         assertArrayEquals(randomValue, byteArrayCache.get(key));
+            byteArrayCache.put(key, randomValue);
+            assertArrayEquals(randomValue, byteArrayCache.get(key));
 
-         currentCacheSize = byteArrayCache.size();
-      } while (currentCacheSize > lastCacheSize);
+            currentCacheSize = byteArrayCache.size();
+         } while (currentCacheSize > lastCacheSize);
+      } finally {
+         if (cachingService.isStarted()) {
+            cachingService.stop();
+         }
+         byteArrayCache.stop();
+      }
    }
 
    public void testOnDemandCacheCreation(URL hotRodService) {
